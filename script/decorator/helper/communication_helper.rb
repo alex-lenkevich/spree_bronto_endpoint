@@ -30,6 +30,7 @@ HooksHelper.class_eval do
         return {:data => data, :code => 200, :message => 'Message sent success.'}
       end
     rescue Exception => e
+      puts e.backtrace
       return {:data => data, :code => 500, :message => e.message}
     end
   end
@@ -53,6 +54,7 @@ HooksHelper.class_eval do
         return {:data => data, :code => 200, :message => 'Contact added to list successful.'}
       end
     rescue Exception => e
+      puts e.backtrace
       return {:data => data, :code => 500, :message => e.message}
     end
   end
@@ -66,15 +68,16 @@ HooksHelper.class_eval do
       #get contact by email or create new with this email
       list = data.parameters[:list_id]
       list = required(data, :list_id) if list.nil?
-      result = bronto_api.remove_from_list(list, data.member.email)
+      result = bronto_api.remove_from_list([list], data.member.email)
 
       #return result of sending
-      if result[:is_error] && result[:error_code] != '506'
+      if !result.nil? && result[:is_error] && result[:error_code] != '506'
         return {:data => data, :code => 500, :message => 'Bronto Error Code ' + result[:error_code] + ': ' + result[:error_string]}
       else
         return {:data => data, :code => 200, :message => 'Contact removed from list successful.'}
       end
     rescue Exception => e
+      puts e.backtrace
       return {:data => data, :code => 500, :message => e.message}
     end
   end
@@ -96,7 +99,7 @@ HooksHelper.class_eval do
         return {:data => data, :code => 200, :message => 'Contact removed from list successful.'}
       end
     rescue Exception => e
-      puts e
+      puts e.backtrace
       return {:data => data, :code => 500, :message => e.message}
     end
   end
